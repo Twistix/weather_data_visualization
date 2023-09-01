@@ -68,7 +68,7 @@ os.makedirs(path)
 # ============================ Downloading data =================================
 # Download link parameters
 grid = ["001", "0025"]
-cover = ["TOTAL_PRECIPITATION_RATE__GROUND_OR_WATER_SURFACE"]
+cover = ["TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE"]
 
 #Indexes for parameters
 if data_type == "rain" :
@@ -104,7 +104,7 @@ for time in range(0, 24):
 		current_day = actual_day + 1
 
 	print("Downloading grib file for hour H+"+"{:02d}".format(time))
-	url = "https://public-api.meteofrance.fr/public/arome/1.0/wcs/MF-NWP-HIGHRES-AROME-"+grid[i_grid]+"-FRANCE-WCS/GetCoverage?token=test&SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCoverage&format=application/wmo-grib&coverageId="+cover[i_cover]+"___"+gen_time(actual_year, actual_month, ref_day, ref_hour)+"&subset=time("+gen_time(actual_year, actual_month, current_day, current_hour)+")&subset=lat("+str(min_lat)+","+str(max_lat)+"7)&subset=long("+str(min_lon)+","+str(max_lon)+")"
+	url = "https://public-api.meteofrance.fr/public/arome/1.0/wcs/MF-NWP-HIGHRES-AROME-"+grid[i_grid]+"-FRANCE-WCS/GetCoverage?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCoverage&format=application/wmo-grib&coverageId="+cover[i_cover]+"___"+gen_time(actual_year, actual_month, ref_day, ref_hour)+"_PT1H&subset=time("+gen_time(actual_year, actual_month, current_day, current_hour)+")&subset=lat("+str(min_lat)+","+str(max_lat)+"7)&subset=long("+str(min_lon)+","+str(max_lon)+")"
 	print(url)
 	r = requests.get(url, headers={"apikey": API_KEY})
 	f = open("temp/grib_file_H"+"{:02d}".format(time)+".grib2", "wb")
