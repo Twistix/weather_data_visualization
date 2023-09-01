@@ -118,14 +118,7 @@ for time in range(0, 24):
 
 	grib_message = gribfile.message(1)
 
-	lats, lons = grib_message.latlons()
-	values = grib_message.values
-
-	#Sur une "ligne" de values, les latitudes sont les memes
-	data = np.zeros((len(values[0]),len(values)))
-	for lat_index in range(len(values)):
-		for lon_index in range(len(values[0])):
-			data[lon_index,lat_index] = values[lat_index][lon_index]
+	data, lats, lons = grib_message.data()
 
 
 	# ======== Carte ===========
@@ -137,8 +130,6 @@ for time in range(0, 24):
 	ax.add_image(request, 10)
 
 	data = np.ma.masked_array(data, data < 0.5)
-	data = np.rot90(data, 3)
-	data = np.flip(data, axis=1)
 
 	cmap = plt.cm.get_cmap("jet")
 	plot = ax.pcolormesh(lons, lats, data, cmap=cmap, transform=ccrs.PlateCarree(), shading="auto", alpha=0.6);
