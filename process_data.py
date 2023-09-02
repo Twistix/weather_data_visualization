@@ -34,8 +34,8 @@ raw_data_path = sys.argv[5]
 
 min_lat = center_lat - radius/110.574
 max_lat = center_lat + radius/110.574
-min_lon = center_lon - radius/(111.320*cos(center_lat))
-max_lon = center_lon + radius/(111.320*cos(center_lat))
+min_lon = center_lon - radius/(111.320*cos(center_lat*(pi/180)))
+max_lon = center_lon + radius/(111.320*cos(center_lat*(pi/180)))
 
 actual_year = int(datetime.date.today().year)
 actual_month = int(datetime.date.today().month)
