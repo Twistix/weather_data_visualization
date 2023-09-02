@@ -4,7 +4,7 @@ import os
 import shutil
 import datetime
 from math import *
-import pygrib
+import eccodes
 import numpy as np
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
@@ -65,13 +65,33 @@ for time in range(0, 24):
 
 	#Process grib file
 	print("Processing grib file for "+str(data_type)+" at hour H+"+"{:02d}".format(time))
-	gribfile = pygrib.open(raw_data_path+"/"+str(data_type)+"/grib_file_"+str(data_type)+"_H"+"{:02d}".format(time)+".grib2")
+	f = open(raw_data_path+"/"+str(data_type)+"/grib_file_"+str(data_type)+"_H"+"{:02d}".format(time)+".grib2", "rb")
+	gid = eccodes.codes_grib_new_from_file(f)
+	Ni = eccodes.codes_get(gid, "Ni")	#Number of points allong a parallel or x axis
+	Nj = eccodes.codes_get(gid, "Nj")	#Number of points allong a meridian or y axis
+	values = eccodes.codes_get_array(gid, "values")
+	lats = eccodes.codes_get_array(gid, "latitudes")
+	lons = eccodes.codes_get_array(gid, "longitudes")
+	grib_min_lat = np.min(lats)
+	grib_max_lat = np.max(lats)
+	grib_min_lon = np.min(lons)
+	grib_max_lon = np.max(lons)
+	values = np.reshape(values, (Ni, Nj))
+	lats = np.reshape(values, (Ni, Nj))
+	lons = np.reshape(values, (Ni, Nj))
 
-	grib_message = gribfile.message(1)
+	eccodes.codes_release(gid)
+	f.close()
 
-	values, lats, lons = grib_message.data(lat1=min_lat,lat2=max_lat,lon1=min_lon,lon2=max_lon)
 
-	gribfile.close()
+	#Crop numpy array to the region selected by user
+	min_x_index = int(Ni * ((min_lon - grib_min_lon) / (grib_max_lon - grib_min_lon)))
+	max_x_index = ceil(Ni * ((max_lon - grib_min_lon) / (grib_max_lon - grib_min_lon)))
+	min_y_index = int(Nj * ((min_lat - grib_min_lat) / (grib_max_lat - grib_min_lat)))
+	max_y_index = ceil(Nj * ((max_lat - grib_min_lat) / (grib_max_lat - grib_min_lat)))
+	values = values[min_x_index:max_x_index,min_y_index:max_y_index]
+	lats = lats[min_x_index:max_x_index,min_y_index:max_y_index]
+	lons = lons[min_x_index:max_x_index,min_y_index:max_y_index]
 
 
 	#Construct map
