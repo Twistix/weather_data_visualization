@@ -47,7 +47,7 @@ actual_hour = int(datetime.datetime.now().hour)
 # ========================= Initializing directories ===========================
 curent_dir = os.getcwd()
 
-path = curent_dir+"/meteo_output"
+path = curent_dir+"/meteo_outputs"
 if os.path.exists(path):
 	shutil.rmtree(path)
 os.makedirs(path)
@@ -89,5 +89,5 @@ for time in range(0, 24):
 
 	fig.suptitle(str(data_type)+" - "+str(current_day)+"/"+str(actual_month)+"/"+str(actual_year)+" "+str(current_hour)+"h00")
 
-	plt.savefig("meteo_output/image_"+str(time)+".png")
+	plt.savefig("meteo_outputs/image_"+str(time)+".png")
 	plt.close()
