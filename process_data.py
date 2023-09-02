@@ -71,6 +71,8 @@ for time in range(0, 24):
 
 	values, lats, lons = grib_message.data(lat1=min_lat,lat2=max_lat,lon1=min_lon,lon2=max_lon)
 
+	gribfile.close()
+
 
 	#Construct map
 	request = cimgt.OSM()
