@@ -69,19 +69,23 @@ for time in range(0, 24):
 	gid = eccodes.codes_grib_new_from_file(f)
 	Ni = eccodes.codes_get(gid, "Ni")	#Number of points allong a parallel or x axis
 	Nj = eccodes.codes_get(gid, "Nj")	#Number of points allong a meridian or y axis
-	values = eccodes.codes_get_array(gid, "values")
-	lats = eccodes.codes_get_array(gid, "latitudes")
-	lons = eccodes.codes_get_array(gid, "longitudes")
+	values = eccodes.codes_get_array(gid, "values", float)
+	lats = eccodes.codes_get_array(gid, "latitudes", float)
+	lons = eccodes.codes_get_array(gid, "longitudes", float)
 	grib_min_lat = np.min(lats)
 	grib_max_lat = np.max(lats)
 	grib_min_lon = np.min(lons)
 	grib_max_lon = np.max(lons)
-	values = np.reshape(values, (Ni, Nj))
-	lats = np.reshape(values, (Ni, Nj))
-	lons = np.reshape(values, (Ni, Nj))
+	values = np.reshape(values, (Nj, Ni))
+	lats = np.reshape(lats, (Nj, Ni))
+	lons = np.reshape(lons, (Nj, Ni))
 
 	eccodes.codes_release(gid)
 	f.close()
+
+
+	#Filter missing values
+	values[values>9998] = 0
 
 
 	#Crop numpy array to the region selected by user
@@ -89,9 +93,9 @@ for time in range(0, 24):
 	max_x_index = ceil(Ni * ((max_lon - grib_min_lon) / (grib_max_lon - grib_min_lon)))
 	min_y_index = int(Nj * ((min_lat - grib_min_lat) / (grib_max_lat - grib_min_lat)))
 	max_y_index = ceil(Nj * ((max_lat - grib_min_lat) / (grib_max_lat - grib_min_lat)))
-	values = values[min_x_index:max_x_index,min_y_index:max_y_index]
-	lats = lats[min_x_index:max_x_index,min_y_index:max_y_index]
-	lons = lons[min_x_index:max_x_index,min_y_index:max_y_index]
+	values = values[Nj-max_y_index:Nj-min_y_index,min_x_index:max_x_index]
+	lats = lats[Nj-max_y_index:Nj-min_y_index,min_x_index:max_x_index]
+	lons = lons[Nj-max_y_index:Nj-min_y_index,min_x_index:max_x_index]
 
 
 	#Construct map
@@ -103,7 +107,6 @@ for time in range(0, 24):
 	ax.add_image(request, 10)
 
 	values = np.ma.masked_array(values, values < 0.5)
-
 	cmap = plt.cm.get_cmap("jet")
 	plot = ax.pcolormesh(lons, lats, values, cmap=cmap, transform=ccrs.PlateCarree(), shading="auto", alpha=0.6);
 
