@@ -7,7 +7,7 @@ process_data.py
 process les données brutes pour générer les cartes
 
 	commande :
-	python3 process_data.py [lat] [lon] [radius(km)] [type(rain)] [raw_data_path]
+	python3 process_data.py [lat] [lon] [radius(km)] [raw_data_path] [type(rain,temp,clouds)] [type] ...
 
 	example :
-	python3 process_data.py 43.6 1.44 100 rain raw_data
+	python3 process_data.py 43.6 1.44 100 raw_data rain temp
