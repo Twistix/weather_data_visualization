@@ -2,7 +2,7 @@
 import sys
 import os
 import shutil
-import datetime
+from datetime import datetime, timedelta
 import requests
 
 
@@ -26,7 +26,7 @@ def get_data_parameters_by_type(data_type):
 
 
 
-# =============================== User inputs ==================================
+# =============================== User inputs ====================================
 data_types = []
 if (len(sys.argv[1:]) > 0):
 	for i in range(len(sys.argv[1:])):
@@ -39,37 +39,32 @@ else:
 
 
 
-# =============================== Globals ==================================
-actual_year = int(datetime.date.today().year)
-actual_month = int(datetime.date.today().month)
-actual_day = int(datetime.date.today().day)
-actual_hour = int(datetime.datetime.now().hour)
-
+# =============================== Globals =========================================
+current_time = datetime.today()
 current_dir = os.getcwd()
 
 
-
 # ============================ Downloading grib files =================================
-# Download link parameters
-ref_day = actual_day
-if actual_hour < 3:
+#Calculate reference hour of the run
+ref_day = int(current_time.day)
+if int(current_time.hour) < 3:
 	ref_hour = 15
-	ref_day = actual_day - 1
-elif actual_hour < 6:
+	ref_day = int(current_time.day) - 1
+elif int(current_time.hour) < 6:
 	ref_hour = 18
-	ref_day = actual_day - 1
-elif actual_hour < 9 :
+	ref_day = int(current_time.day) - 1
+elif int(current_time.hour) < 9 :
 	ref_hour = 21
-	ref_day = actual_day - 1
-elif actual_hour < 12 :
+	ref_day = int(current_time.day) - 1
+elif int(current_time.hour) < 12 :
 	ref_hour = 0
-elif actual_hour < 15 :
+elif int(current_time.hour) < 15 :
 	ref_hour = 3
-elif actual_hour < 18 :
+elif int(current_time.hour) < 18 :
 	ref_hour = 6
-elif actual_hour < 21 :
+elif int(current_time.hour) < 21 :
 	ref_hour = 9
-elif actual_hour < 24 :
+elif int(current_time.hour) < 24 :
 	ref_hour = 12
 
 for data_type in data_types :
@@ -81,18 +76,19 @@ for data_type in data_types :
 	os.makedirs(path)
 
 	#Downloading data
-	for time in range(0, 24):
-		current_hour = actual_hour + time
-		current_day = actual_day
-		if current_hour >= 24:
-			current_hour = current_hour - 24
-			current_day = actual_day + 1
+	for i in range(0, 36):
+		current_year = int(current_time.year)
+		current_month = int(current_time.month)
+		current_day = int(current_time.day)
+		current_hour = int(current_time.hour)
 
-		print("Downloading grib file for hour H+"+"{:02d}".format(time))
+		print("Downloading grib file for hour H+"+"{:02d}".format(i))
 		cover_name,cummul_duration,grid = get_data_parameters_by_type(data_type)
-		url = "https://public-api.meteofrance.fr/public/arome/1.0/wcs/MF-NWP-HIGHRES-AROME-"+grid+"-FRANCE-WCS/GetCoverage?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCoverage&format=application/wmo-grib&coverageId="+cover_name+"___"+gen_time(actual_year, actual_month, ref_day, ref_hour)+cummul_duration+"&subset=time("+gen_time(actual_year, actual_month, current_day, current_hour)+")"
+		url = "https://public-api.meteofrance.fr/public/arome/1.0/wcs/MF-NWP-HIGHRES-AROME-"+grid+"-FRANCE-WCS/GetCoverage?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCoverage&format=application/wmo-grib&coverageId="+cover_name+"___"+gen_time(current_year, current_month, ref_day, ref_hour)+cummul_duration+"&subset=time("+gen_time(current_year, current_month, current_day, current_hour)+")"
 		print(url)
 		r = requests.get(url, headers={"apikey": API_KEY})
-		f = open("raw_data/"+str(data_type)+"/grib_file_"+str(data_type)+"_H"+"{:02d}".format(time)+".grib2", "wb")
+		f = open("raw_data/"+str(data_type)+"/grib_"+str(data_type)+"_"+gen_time(current_year, current_month, current_day, current_hour)+".grib2", "wb")
 		f.write(r.content)
 		f.close()
+
+		current_time = current_time + timedelta(hours=1)
