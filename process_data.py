@@ -62,14 +62,9 @@ def process(center_lat, center_lon, radius, data_type):
     os.makedirs(path)
 
     for i in range(0, 24):
-        current_year = int(current_time.year)
-        current_month = int(current_time.month)
-        current_day = int(current_time.day)
-        current_hour = int(current_time.hour)
-
         #Process grib file
         print("Processing grib file for "+str(data_type)+" at hour H+"+"{:02d}".format(i))
-        f = open("raw_data/"+str(data_type)+"/grib_"+str(data_type)+"_"+gen_time(current_year, current_month, current_day, current_hour)+".grib2", "rb")
+        f = open("raw_data/"+str(data_type)+"/grib_"+str(data_type)+"_"+gen_time(current_time.year, current_time.month, current_time.day, current_time.hour)+".grib2", "rb")
         gid = eccodes.codes_grib_new_from_file(f)
         Ni = eccodes.codes_get(gid, "Ni")   #Number of points allong a parallel or x axis
         Nj = eccodes.codes_get(gid, "Nj")   #Number of points allong a meridian or y axis
@@ -112,7 +107,7 @@ def process(center_lat, center_lon, radius, data_type):
 
         fig.colorbar(plot)
 
-        fig.suptitle(str(data_type)+" - "+gen_time(current_year, current_month, current_day, current_hour))
+        fig.suptitle(str(data_type)+" - "+gen_time(current_time.year, current_time.month, current_time.day, current_time.hour))
 
         plt.savefig("meteo_outputs/"+str(data_type)+"/image_"+str(i)+".png")
         plt.close()
