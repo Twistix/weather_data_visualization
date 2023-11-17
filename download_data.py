@@ -18,13 +18,13 @@ def gen_time(year, month, day, hour):
 	return "{:04d}".format(year)+"-"+"{:02d}".format(month)+"-"+"{:02d}".format(day)+"T"+"{:02d}".format(hour)+":00:00Z"
 
 def get_data_parameters_by_type(data_type):
-	# return cover_name,cummul_duration,grid
+	# return cover_name,cummul_duration,grid,start_time
 	if data_type == "rain":
-		return "TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE","_PT1H","001"
+		return "TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE","_PT1H","001",1
 	elif data_type == "temp":
-		return "TEMPERATURE__GROUND_OR_WATER_SURFACE","","0025"
+		return "TEMPERATURE__GROUND_OR_WATER_SURFACE","","0025",0
 	elif data_type == "clouds":
-		return "TOTAL_CLOUD_COVER__GROUND_OR_WATER_SURFACE","","0025"
+		return "TOTAL_CLOUD_COVER__GROUND_OR_WATER_SURFACE","","0025",1
 
 def calculate_ref_time(current_time):
 	if int(current_time.hour) < 3:
@@ -63,7 +63,8 @@ current_dir = os.getcwd()
 # ============================ Download grib files =================================
 def download(data_type, ref_time):
 	#Variables
-	current_time = ref_time
+	cover_name,cummul_duration,grid,start_time = get_data_parameters_by_type(data_type)
+	current_time = ref_time + timedelta(hours=start_time)
 
 	#Initializing directory
 	path = current_dir+"/raw_data/"+str(data_type)
@@ -72,12 +73,12 @@ def download(data_type, ref_time):
 	os.makedirs(path)
 
 	#Downloading data
-	for i in range(0, 36):
+	for i in range(start_time, 38):
 		print("Downloading grib file for hour H+"+"{:02d}".format(i))
-		cover_name,cummul_duration,grid = get_data_parameters_by_type(data_type)
 		url = "https://public-api.meteofrance.fr/public/arome/1.0/wcs/MF-NWP-HIGHRES-AROME-"+grid+"-FRANCE-WCS/GetCoverage?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCoverage&format=application/wmo-grib&coverageId="+cover_name+"___"+gen_time(ref_time.year, ref_time.month, ref_time.day, ref_time.hour)+cummul_duration+"&subset=time("+gen_time(current_time.year, current_time.month, current_time.day, current_time.hour)+")"
 		print(url)
 		r = requests.get(url, headers={"apikey": API_KEY})
+		r.raise_for_status()
 		f = open("raw_data/"+str(data_type)+"/grib_"+str(data_type)+"_"+gen_time(current_time.year, current_time.month, current_time.day, current_time.hour)+".grib2", "wb")
 		f.write(r.content)
 		f.close()
