@@ -5,6 +5,7 @@ import shutil
 import argparse
 from datetime import datetime, timedelta
 import requests
+import re
 
 
 # ================================ Constants =====================================
@@ -14,36 +15,18 @@ DEFAULT_DATA_TYPE = AVAILABLE_DATA_TYPES
 
 
 # ============================= Usefull functions =============================
-def gen_time(year, month, day, hour):
-	return "{:04d}".format(year)+"-"+"{:02d}".format(month)+"-"+"{:02d}".format(day)+"T"+"{:02d}".format(hour)+":00:00Z"
+def string_time_from_time(time):
+    return "{:04d}".format(time.year)+"-"+"{:02d}".format(time.month)+"-"+"{:02d}".format(time.day)+"T"+"{:02d}".format(time.hour)+":00:00Z"
+
 
 def get_data_parameters_by_type(data_type):
-	# return cover_name,cummul_duration,grid,start_time
-	if data_type == "rain":
-		return "TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE","_PT1H","001",1
-	elif data_type == "temp":
-		return "TEMPERATURE__GROUND_OR_WATER_SURFACE","","0025",0
-	elif data_type == "clouds":
-		return "TOTAL_CLOUD_COVER__GROUND_OR_WATER_SURFACE","","0025",1
-
-def calculate_ref_time(current_time):
-	if int(current_time.hour) < 3:
-		ref_time = current_time + timedelta(hours=-int(current_time.hour)-9)
-	elif int(current_time.hour) < 6:
-		ref_time = current_time + timedelta(hours=-int(current_time.hour)-6)
-	elif int(current_time.hour) < 9:
-		ref_time = current_time + timedelta(hours=-int(current_time.hour)-3)
-	elif int(current_time.hour) < 12:
-		ref_time = current_time + timedelta(hours=-int(current_time.hour))
-	elif int(current_time.hour) < 15:
-		ref_time = current_time + timedelta(hours=-int(current_time.hour)+3)
-	elif int(current_time.hour) < 18:
-		ref_time = current_time + timedelta(hours=-int(current_time.hour)+6)
-	elif int(current_time.hour) < 21:
-		ref_time = current_time + timedelta(hours=-int(current_time.hour)+9)
-	else:
-		ref_time = current_time + timedelta(hours=-int(current_time.hour)+12)
-	return ref_time
+    # return cover_name,cummul_duration,grid,start_time
+    if data_type == "rain":
+        return "TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE","_PT1H","001",1
+    elif data_type == "temp":
+        return "TEMPERATURE__GROUND_OR_WATER_SURFACE","","0025",0
+    elif data_type == "clouds":
+        return "TOTAL_CLOUD_COVER__GROUND_OR_WATER_SURFACE","","0025",1
 
 
 # =============================== User inputs ==================================
@@ -57,33 +40,74 @@ def parse_inputs():
 
 
 # =============================== Globals =========================================
-current_dir = os.getcwd()
+
+
+# ============================ Find last run time =================================
+def calculate_ref_time(data_type, current_time):
+    #Variables
+    cover_name,cummul_duration,grid,start_time = get_data_parameters_by_type(data_type)
+    line_content_search = [cover_name, cummul_duration]
+    ref_time = datetime(2000, 1, 1, 0, 0, 0)
+
+    #Initializing temporary directory
+    current_dir = os.getcwd()
+    path = current_dir+"/temp"
+    if os.path.exists(path):
+        shutil.rmtree(path)
+    os.makedirs(path)
+
+    #Download WCS capabilities file
+    print("Downloading WCS capabilities file")
+    url = "https://public-api.meteofrance.fr/public/arome/1.0/wcs/MF-NWP-HIGHRES-AROME-"+grid+"-FRANCE-WCS/GetCapabilities?SERVICE=WCS&VERSION=1.3.0&REQUEST=GetCapabilities"
+    print(url)
+    r = requests.get(url, headers={"apikey": API_KEY})
+    r.raise_for_status()
+    f = open("temp/WCS_capabilities", "wb")
+    f.write(r.content)
+    f.close()
+
+    #First we search cover in the 001 file
+    with open("temp/WCS_capabilities", "r") as fp:
+        for l_no, line in enumerate(fp):
+            #We enumerate through all lines, each time we find the cover we update ref_time, and we continue searching
+            #since the run times are more recent when descending in the file
+            if all(x in line for x in line_content_search):
+                int_in_line = [int(s) for s in re.findall(r"\d+", line)]
+                ref_time = ref_time.replace(year=int_in_line[0], month=int_in_line[1], day=int_in_line[2], hour=int_in_line[3])
+
+    #Remove temp files
+    shutil.rmtree(path)
+
+    print("Ref time for "+data_type+" is "+str(ref_time))
+
+    return ref_time
 
 
 # ============================ Download grib files =================================
-def download(data_type, ref_time):
-	#Variables
-	cover_name,cummul_duration,grid,start_time = get_data_parameters_by_type(data_type)
-	current_time = ref_time + timedelta(hours=start_time)
+def download(data_type, ref_time, nb_hours):
+    #Variables
+    cover_name,cummul_duration,grid,start_time = get_data_parameters_by_type(data_type)
+    current_time = ref_time + timedelta(hours=start_time)
 
-	#Initializing directory
-	path = current_dir+"/raw_data/"+str(data_type)
-	if os.path.exists(path):
-		shutil.rmtree(path)
-	os.makedirs(path)
+    #Initializing directory
+    current_dir = os.getcwd()
+    path = current_dir+"/raw_data/"+str(data_type)
+    if os.path.exists(path):
+        shutil.rmtree(path)
+    os.makedirs(path)
 
-	#Downloading data
-	for i in range(start_time, 38):
-		print("Downloading grib file for hour H+"+"{:02d}".format(i))
-		url = "https://public-api.meteofrance.fr/public/arome/1.0/wcs/MF-NWP-HIGHRES-AROME-"+grid+"-FRANCE-WCS/GetCoverage?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCoverage&format=application/wmo-grib&coverageId="+cover_name+"___"+gen_time(ref_time.year, ref_time.month, ref_time.day, ref_time.hour)+cummul_duration+"&subset=time("+gen_time(current_time.year, current_time.month, current_time.day, current_time.hour)+")"
-		print(url)
-		r = requests.get(url, headers={"apikey": API_KEY})
-		r.raise_for_status()
-		f = open("raw_data/"+str(data_type)+"/grib_"+str(data_type)+"_"+gen_time(current_time.year, current_time.month, current_time.day, current_time.hour)+".grib2", "wb")
-		f.write(r.content)
-		f.close()
+    #Downloading data
+    for i in range(start_time, nb_hours):
+        print("Downloading grib file for hour H+"+"{:02d}".format(i))
+        url = "https://public-api.meteofrance.fr/public/arome/1.0/wcs/MF-NWP-HIGHRES-AROME-"+grid+"-FRANCE-WCS/GetCoverage?SERVICE=WCS&VERSION=2.0.1&REQUEST=GetCoverage&format=application/wmo-grib&coverageId="+cover_name+"___"+string_time_from_time(ref_time)+cummul_duration+"&subset=time("+string_time_from_time(current_time)+")"
+        print(url)
+        r = requests.get(url, headers={"apikey": API_KEY})
+        r.raise_for_status()
+        f = open("raw_data/"+str(data_type)+"/grib_"+str(data_type)+"_"+string_time_from_time(current_time)+".grib2", "wb")
+        f.write(r.content)
+        f.close()
 
-		current_time = current_time + timedelta(hours=1)
+        current_time = current_time + timedelta(hours=1)
 
 
 if __name__ == "__main__":
@@ -91,8 +115,8 @@ if __name__ == "__main__":
 
     data_types = args.data_types
 
-    current_time = datetime.today()
-    ref_time = calculate_ref_time(current_time)
+    current_time = datetime.now()
 
     for data_type in data_types :
-        download(data_type, ref_time)
+        ref_time = calculate_ref_time(data_type, current_time)
+        download(data_type, ref_time, 36)
