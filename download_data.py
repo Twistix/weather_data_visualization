@@ -47,6 +47,7 @@ def calculate_ref_time(data_type, current_time):
     #Variables
     cover_name,cummul_duration,grid,start_time = get_data_parameters_by_type(data_type)
     line_content_search = [cover_name, cummul_duration]
+    line_matches = []
     ref_time = datetime(2000, 1, 1, 0, 0, 0)
 
     #Initializing temporary directory
@@ -66,14 +67,18 @@ def calculate_ref_time(data_type, current_time):
     f.write(r.content)
     f.close()
 
-    #First we search cover in the 001 file
+    #First we search each line that matches cover name and cummul time in the file
     with open("temp/WCS_capabilities", "r") as fp:
         for l_no, line in enumerate(fp):
-            #We enumerate through all lines, each time we find the cover we update ref_time, and we continue searching
-            #since the run times are more recent when descending in the file
             if all(x in line for x in line_content_search):
-                int_in_line = [int(s) for s in re.findall(r"\d+", line)]
-                ref_time = ref_time.replace(year=int_in_line[0], month=int_in_line[1], day=int_in_line[2], hour=int_in_line[3])
+                line_matches.append(line)
+
+    #The corresponding lines are recorded from the oldest to the most recent, 
+    #since the times of the runs are more and more recent as we go down in the file
+
+    #We take the second to last line that matches as the ref time (sometimes the last run available is not totaly finished)
+    int_in_line = [int(s) for s in re.findall(r"\d+", line_matches[-2])]
+    ref_time = ref_time.replace(year=int_in_line[0], month=int_in_line[1], day=int_in_line[2], hour=int_in_line[3])
 
     #Remove temp files
     shutil.rmtree(path)
