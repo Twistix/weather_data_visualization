@@ -7,10 +7,10 @@ from datetime import datetime, timedelta
 import math
 import eccodes
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.io.img_tiles as cimgt
+import gc
 
 
 # ================================ Constants =====================================
@@ -97,20 +97,27 @@ def process(center_lat, center_lon, radius, data_type):
         request = cimgt.OSM()
         extent = [min_lon, max_lon, min_lat, max_lat]
 
-        fig, ax = plt.subplots(subplot_kw=dict(projection=request.crs))
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection=request.crs)
         ax.set_extent(extent)
-        ax.add_image(request, 10)
+        ax.add_image(request, 9)
 
         values = np.ma.masked_array(values, values < 0.5)
-        cmap = plt.cm.get_cmap("jet")
-        plot = ax.pcolormesh(lons, lats, values, cmap=cmap, transform=ccrs.PlateCarree(), shading="auto", alpha=0.6);
-
+        cmap = plt.get_cmap("jet")
+        plot = ax.pcolormesh(lons, lats, values, cmap=cmap, transform=ccrs.PlateCarree(), shading="auto", alpha=0.6)
         fig.colorbar(plot)
 
         fig.suptitle(str(data_type)+" - "+gen_time(current_time.year, current_time.month, current_time.day, current_time.hour))
+        fig.savefig("meteo_outputs/"+str(data_type)+"/image_"+str(i)+".png")
 
-        plt.savefig("meteo_outputs/"+str(data_type)+"/image_"+str(i)+".png")
-        plt.close()
+        # Clear the current axes
+        plt.cla() 
+        # Clear the current figure
+        plt.clf() 
+        # Closes all the figure windows
+        plt.close("all")
+        #Collect garbage
+        gc.collect()
 
         current_time = current_time + timedelta(hours=1)
 
