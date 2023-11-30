@@ -35,7 +35,7 @@ The eccodes Python library is just a wrapper, and then need the libeccodes-dev p
                                   Metrics wanted (default: ['rain', 'temp', 'clouds'])
 
         example :
-        python3 down_data.py -d rain temp
+        python3 download_data.py -d rain temp
 
 - **process_data.py**
 
