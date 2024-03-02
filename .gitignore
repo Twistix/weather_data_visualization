@@ -1,3 +1,2 @@
-raw_data
-weather_outputs
-overlays
+core/raw_data
+core/weather_outputs

@@ -1,0 +1,32 @@
+.weather_column {
+	float: left;
+	width: 33%;
+}
+
+.weather_row:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.slide_img {
+    width: 100%;
+    object-position: center;
+}
+
+.slide_select {
+	width: 100%;
+	text-align: center;
+}
+
+.selector {
+	font-size: 16px;
+    background-color: #208823;
+	border: none;
+	color: white;
+	padding: 5px 10px;
+	text-align: center;
+	display: inline-block;
+	margin: 4px 2px;
+	cursor: pointer;
+}
