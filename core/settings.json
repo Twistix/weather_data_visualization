@@ -21,7 +21,7 @@
                     "start_time": "0",
                     "operation": "-273",
                     "filter": "> 999",
-                    "cmap": "heatmap",
+                    "cmap": "jet",
                     "range_min": "-20",
                     "range_max": "50"
                 },
