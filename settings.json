@@ -10,7 +10,7 @@
                     "start_time": "1",
                     "operation": "",
                     "filter": "< 0.5",
-                    "plot_type": "heatmap",
+                    "cmap": "Blues",
                     "range_min": "0",
                     "range_max": "30"
                 },
@@ -21,7 +21,7 @@
                     "start_time": "0",
                     "operation": "-273",
                     "filter": "> 999",
-                    "plot_type": "heatmap",
+                    "cmap": "heatmap",
                     "range_min": "-20",
                     "range_max": "50"
                 },
@@ -32,7 +32,7 @@
                     "start_time": "1",
                     "operation": "",
                     "filter": "< 0.5",
-                    "plot_type": "heatmap",
+                    "cmap": "Greys",
                     "range_min": "0",
                     "range_max": "100"
                 }
