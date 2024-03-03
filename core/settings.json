@@ -10,7 +10,7 @@
                     "start_time": "1",
                     "operation": "",
                     "filter": "< 0.5",
-                    "cmap": "Blues",
+                    "cmap": "jet",
                     "range_min": "0",
                     "range_max": "30"
                 },

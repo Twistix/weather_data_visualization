@@ -3,12 +3,13 @@
     <head>
 		<meta charset="utf-8">
         <title>Meteo</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 		<link rel="stylesheet" href="style.css">
-		<script src="script.js"></script>
+		<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     </head>
     <body>
 		<h1>
-			Ci-dessous, les prévisions du modèle AROME pour les prochaines 24h aux alentours de Toulouse (centré sur Toulouse avec rayon de 100km) :
+			Ci-dessous, les prévisions du modèle AROME pour les prochaines 24h :
 		</h1>
 
 		<br>
@@ -16,17 +17,18 @@
 		<div class="weather_row">
 			<!-- Temperature !-->
 			<div class="weather_column">
-				<img class="slide_img" id="img_temp" src="weather_outputs/temp/image_0.png">
+				<div class="weather_map" id="temp_map"></div>
+				
 			</div>
 
 			<!-- Clouds !-->
 			<div class="weather_column">
-				<img class="slide_img" id="img_clouds" src="weather_outputs/clouds/image_0.png">
+				<div class="weather_map" id="clouds_map"></div>
 			</div>
 
 			<!-- Rain !-->
 			<div class="weather_column">
-				<img class="slide_img" id="img_rain" src="weather_outputs/rain/image_0.png">
+				<div class="weather_map" id="rain_map"></div>
 			</div>
 		</div>
 
@@ -58,5 +60,7 @@
             <button class="selector" onmouseover="showSlides(22)">22h</button>
             <button class="selector" onmouseover="showSlides(23)">23h</button>
         </div>
+
+        <script src="script.js"></script>
     </body>
 </html>
