@@ -7,7 +7,7 @@ WORKDIR /
 
 #Install dependencies
 RUN     apt update && \
-        apt install -y python3 python3-pip libeccodes-dev cron vim && \
+        apt install -y python3 python3-pip libeccodes-dev cron vim gdal-bin && \
         apt clean
 
 #Install Python packages
