@@ -13,8 +13,8 @@ L.tileLayer(basemapUrl).addTo(clouds_map);
 L.tileLayer(basemapUrl).addTo(rain_map);
 
 // Add weather radar to the map
-var corner1 = L.latLng(39.6, -8),
-    corner2 = L.latLng(53.6, 12),
+var corner1 = L.latLng(40, -8),
+    corner2 = L.latLng(54, 12),
     bounds = L.latLngBounds(corner1, corner2);
 temp_overlay = L.imageOverlay("weather_outputs/temp/image_0.png", bounds, { opacity: 0.5 }).addTo(temp_map);
 clouds_overlay = L.imageOverlay("weather_outputs/clouds/image_0.png", bounds, { opacity: 0.5 }).addTo(clouds_map);

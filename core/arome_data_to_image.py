@@ -11,16 +11,13 @@ import matplotlib as mpl
 from PIL import Image
 import gc
 import json
+import subprocess
 
 
 # ================================ Constants =====================================
 
 
 # ============================= Useful functions =============================
-def deg_to_rad(angle):
-    return angle*math.pi/180
-
-
 def time_format_iso8601(time):
     return "{:04d}".format(time.year)+"-"+"{:02d}".format(time.month)+"-"+"{:02d}".format(time.day)+"T"+"{:02d}".format(time.hour)+":00:00Z"
 
@@ -34,6 +31,7 @@ def parse_inputs(available_data_types):
     parser.add_argument("--Mlat", type=float, help="Maximum latitude (in deg)")
     parser.add_argument("--mlon", type=float, help="Minimum longitude (in deg)")
     parser.add_argument("--Mlon", type=float, help="Maximum longitude (in deg)")
+    parser.add_argument('-p', "--projection", type=str, default="EPSG:4326", help="Projection code")
     parser.add_argument('-d', "--data_types", type=str, default=available_data_types, nargs='+', choices=available_data_types, help="Metrics wanted")
 
     return parser.parse_args()
@@ -110,6 +108,7 @@ if __name__ == "__main__":
     Mlat = args.Mlat
     mlon = args.mlon
     Mlon = args.Mlon
+    projection = args.projection
     data_types = args.data_types
 
     for data_type in data_types:
@@ -125,9 +124,23 @@ if __name__ == "__main__":
         for i in range(0, 24):
             image = create_image(mlat, Mlat, mlon, Mlon, data_type, current_time, modele_info["data_types"][data_type])
 
-            #Save image
-            image.save("weather_outputs/"+str(data_type)+"/image_"+str(i)+".png")
-            
+            #Save image before conversion
+            image.save("weather_outputs/"+str(data_type)+"/tmp.png")
+
+            subprocess.run(["gdal_translate",
+                            "-gcp", str(0), str(0), str(mlon), str(Mlat),                           #Top left
+                            "-gcp", str(image.size[0]), str(0), str(Mlon), str(Mlat),               #Top right
+                            "-gcp", str(0), str(image.size[1]), str(mlon), str(mlat),               #Bottom left
+                            "-gcp", str(image.size[0]), str(image.size[1]), str(Mlon), str(mlat),   #Bottom right
+                            "weather_outputs/"+str(data_type)+"/tmp.png",
+                            "weather_outputs/"+str(data_type)+"/intermediate.png"])
+
+            subprocess.run(["gdalwarp",
+                            "-s_srs", modele_info["projection"],
+                            "-t_srs", projection,
+                            "weather_outputs/"+str(data_type)+"/intermediate.png",
+                            "weather_outputs/"+str(data_type)+"/image_"+str(i)+".png"])
+
             #Collect garbage
             gc.collect()
 
