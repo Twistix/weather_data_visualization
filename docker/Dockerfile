@@ -7,12 +7,12 @@ WORKDIR /
 
 #Install dependencies
 RUN     apt update && \
-        apt install -y python3 python3-pip libeccodes-dev cron vim gdal-bin libgdal-dev && \
+        apt install -y python3 python3-pip libeccodes-dev cron vim gdal-bin && \
         apt clean
 
 #Install Python packages
-RUN     apt install -y python3-eccodes python3-numpy python3-matplotlib python3-requests && \
-        apt clean
+RUN     pip3 install --break-system-packages eccodes numpy matplotlib requests && \
+        pip3 cache purge
 
 #Copy repository files
 COPY    core /core
