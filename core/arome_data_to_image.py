@@ -119,6 +119,10 @@ if __name__ == "__main__":
             shutil.rmtree(path)
         os.makedirs(path)
 
+        #Init properties
+        image_properties = {}
+
+        #Get current time from where we generate 24h outputs
         current_time = datetime.now()
 
         for i in range(0, 24):
@@ -141,7 +145,17 @@ if __name__ == "__main__":
                             "weather_outputs/"+str(data_type)+"/intermediate.png",
                             "weather_outputs/"+str(data_type)+"/image_"+str(i)+".png"])
 
+            image_properties["image_"+str(i)+".png"] = {
+                "time" : time_format_iso8601(current_time),
+                "projection" : projection
+            }
+
             #Collect garbage
             gc.collect()
 
             current_time = current_time + timedelta(hours=1)
+
+        #Write properties to file
+        f = open("weather_outputs/"+str(data_type)+"/image_properties.json", "w", encoding="utf-8")
+        json.dump(image_properties, f, ensure_ascii=False, indent=4)
+        f.close()
