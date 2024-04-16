@@ -25,30 +25,32 @@ The eccodes Python library is just a wrapper, and then need the libeccodes-dev p
 
 ## Usage
 
-- **download_data.py**
+- **download_arome_data.py**
 
-        download_data.py [-h] [-d {rain,temp,clouds} [{rain,temp,clouds} ...]]
-
-        options:
-            -h, --help            show this help message and exit
-            -d {rain,temp,clouds} [{rain,temp,clouds} ...], --data_types {rain,temp,clouds} [{rain,temp,clouds} ...]
-                                  Metrics wanted (default: ['rain', 'temp', 'clouds'])
-
-        example :
-        python3 download_data.py -d rain temp
-
-- **process_data.py**
-
-        python3 process_data.py [-h] [--lat LAT] [--lon LON] [-r RADIUS] [-d {rain,temp,clouds} [{rain,temp,clouds} ...]]
+        python3 download_arome_data.py [-h] [-d {rain,temp,clouds} [{rain,temp,clouds} ...]]
 
         options:
-            -h, --help            show this help message and exit
-            --lat LAT             Center latitude (in deg) (default: None)
-            --lon LON             Center longitude (in deg) (default: None)
-            -r RADIUS, --radius RADIUS
-                                  Radius (in km) (default: 100)
-            -d {rain,temp,clouds} [{rain,temp,clouds} ...], --data_types {rain,temp,clouds} [{rain,temp,clouds} ...]
-                                  Metrics wanted (default: ['rain', 'temp', 'clouds'])
+        -h, --help            show this help message and exit
+        -d {rain,temp,clouds} [{rain,temp,clouds} ...], --data_types {rain,temp,clouds} [{rain,temp,clouds} ...]
+                                Metrics wanted (default: ['rain', 'temp', 'clouds'])
 
         example :
-        python3 process_data.py --lat 43.6 --lon 1.44 -r 100 -d rain temp
+        python3 download_arome_data.py -d temp
+
+- **arome_data_to_image.py**
+
+        python3 arome_data_to_image.py [-h] [--mlat MLAT] [--Mlat MLAT] [--mlon MLON] [--Mlon MLON] [-p PROJECTION] [-d {rain,temp,clouds} [{rain,temp,clouds} ...]]
+
+        options:
+        -h, --help            show this help message and exit
+        --mlat MLAT           Minimum latitude (in deg) (default: None)
+        --Mlat MLAT           Maximum latitude (in deg) (default: None)
+        --mlon MLON           Minimum longitude (in deg) (default: None)
+        --Mlon MLON           Maximum longitude (in deg) (default: None)
+        -p PROJECTION, --projection PROJECTION
+                                Projection code (default: EPSG:4326)
+        -d {rain,temp,clouds} [{rain,temp,clouds} ...], --data_types {rain,temp,clouds} [{rain,temp,clouds} ...]
+                                Metrics wanted (default: ['rain', 'temp', 'clouds'])
+
+        example :
+        python3 arome_data_to_image.py --mlat 40 --Mlat 54 --mlon -8 --Mlon 12 -p EPSG:3857 -d temp
