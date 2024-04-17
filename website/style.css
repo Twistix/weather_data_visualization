@@ -33,3 +33,7 @@
     margin: 4px 2px;
     cursor: pointer;
 }
+
+.weather_time {
+    text-align: center;
+}

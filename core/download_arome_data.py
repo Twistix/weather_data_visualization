@@ -123,4 +123,4 @@ if __name__ == "__main__":
         os.makedirs(path)       
 
         ref_time = calculate_arome_ref_time(data_type, modele_info)
-        download_data_arome(data_type, modele_info, ref_time, 34)
+        download_data_arome(data_type, modele_info, ref_time, 36)

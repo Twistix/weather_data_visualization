@@ -81,7 +81,7 @@ def create_image(min_lat, max_lat, min_lon, max_lon, data_type, current_time, da
     values = (values - min_val) / (max_val - min_val)
 
     #Create image
-    cmap = mpl.cm.get_cmap(data_type_info["cmap"])
+    cmap = mpl.colormaps[data_type_info["cmap"]]
     im = Image.fromarray(np.uint8(cmap(values)*255))
 
     return im
@@ -131,31 +131,38 @@ if __name__ == "__main__":
             #Save image before conversion
             image.save("weather_outputs/"+str(data_type)+"/tmp.png")
 
+            #Add ground control points (GCP) to image corners
             subprocess.run(["gdal_translate",
                             "-gcp", str(0), str(0), str(mlon), str(Mlat),                           #Top left
                             "-gcp", str(image.size[0]), str(0), str(Mlon), str(Mlat),               #Top right
                             "-gcp", str(0), str(image.size[1]), str(mlon), str(mlat),               #Bottom left
                             "-gcp", str(image.size[0]), str(image.size[1]), str(Mlon), str(mlat),   #Bottom right
+                            "-q",
                             "weather_outputs/"+str(data_type)+"/tmp.png",
                             "weather_outputs/"+str(data_type)+"/intermediate.png"])
-
+            
+            #Change image projection and save output
             subprocess.run(["gdalwarp",
                             "-s_srs", modele_info["projection"],
                             "-t_srs", projection,
+                            "-q",
+                            "-nomd",
                             "weather_outputs/"+str(data_type)+"/intermediate.png",
                             "weather_outputs/"+str(data_type)+"/image_"+str(i)+".png"])
 
+            #Update properties
             image_properties["image_"+str(i)+".png"] = {
                 "time" : time_format_iso8601(current_time),
                 "projection" : projection
             }
 
-            #Collect garbage
-            gc.collect()
-
+            #Increment current time
             current_time = current_time + timedelta(hours=1)
 
         #Write properties to file
         f = open("weather_outputs/"+str(data_type)+"/image_properties.json", "w", encoding="utf-8")
         json.dump(image_properties, f, ensure_ascii=False, indent=4)
         f.close()
+
+        #Collect garbage
+        gc.collect()
