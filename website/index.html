@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="utf-8">
+        <title>Meteo</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+		<link rel="stylesheet" href="style.css">
+		<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    </head>
+    <body>
+		<h1>
+			Ci-dessous, les prévisions du modèle AROME pour les prochaines 24h :
+		</h1>
+
+		<br>
+
+		<div class="weather_row">
+			<!-- Temperature !-->
+			<div class="weather_column">
+				<p class="weather_time" id="temp_time"></p>
+				<div class="weather_map" id="temp_map"></div>
+			</div>
+
+			<!-- Clouds !-->
+			<div class="weather_column">
+				<p class="weather_time" id="clouds_time"></p>
+				<div class="weather_map" id="clouds_map"></div>
+			</div>
+
+			<!-- Rain !-->
+			<div class="weather_column">
+				<p class="weather_time" id="rain_time"></p>
+				<div class="weather_map" id="rain_map"></div>
+			</div>
+		</div>
+
+        <br>
+		
+        <div class="slide_select">
+            <button class="selector" onmouseover="showSlides(0)">0h</button>
+            <button class="selector" onmouseover="showSlides(1)">1h</button>
+            <button class="selector" onmouseover="showSlides(2)">2h</button>
+			<button class="selector" onmouseover="showSlides(3)">3h</button>
+            <button class="selector" onmouseover="showSlides(4)">4h</button>
+            <button class="selector" onmouseover="showSlides(5)">5h</button>
+			<button class="selector" onmouseover="showSlides(6)">6h</button>
+            <button class="selector" onmouseover="showSlides(7)">7h</button>
+            <button class="selector" onmouseover="showSlides(8)">8h</button>
+			<button class="selector" onmouseover="showSlides(9)">9h</button>
+            <button class="selector" onmouseover="showSlides(10)">10h</button>
+            <button class="selector" onmouseover="showSlides(11)">11h</button>
+			<button class="selector" onmouseover="showSlides(12)">12h</button>
+            <button class="selector" onmouseover="showSlides(13)">13h</button>
+            <button class="selector" onmouseover="showSlides(14)">14h</button>
+			<button class="selector" onmouseover="showSlides(15)">15h</button>
+            <button class="selector" onmouseover="showSlides(16)">16h</button>
+            <button class="selector" onmouseover="showSlides(17)">17h</button>
+			<button class="selector" onmouseover="showSlides(18)">18h</button>
+            <button class="selector" onmouseover="showSlides(19)">19h</button>
+            <button class="selector" onmouseover="showSlides(20)">20h</button>
+			<button class="selector" onmouseover="showSlides(21)">21h</button>
+            <button class="selector" onmouseover="showSlides(22)">22h</button>
+            <button class="selector" onmouseover="showSlides(23)">23h</button>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>

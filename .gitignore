@@ -1,2 +1,3 @@
-raw_data
-meteo_outputs
+core/raw_data
+core/weather_outputs
+website/weather_outputs
