@@ -1,3 +1,4 @@
 core/raw_data
 core/weather_outputs
+core/user_settings.json
 website/weather_outputs

@@ -1,0 +1,42 @@
+{
+    "modeles": {
+        "arome": {
+            "projection": "EPSG:4326",
+            "data_types": {
+                "rain": {
+                    "cover_name": "TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE",
+                    "grid": "001",
+                    "cummul_duration": "_PT1H",
+                    "start_time": "1",
+                    "operation": "",
+                    "filter": "< 0.5",
+                    "cmap": "jet",
+                    "range_min": "0",
+                    "range_max": "30"
+                },
+                "temp": {
+                    "cover_name": "TEMPERATURE__GROUND_OR_WATER_SURFACE",
+                    "grid": "0025",
+                    "cummul_duration": "",
+                    "start_time": "0",
+                    "operation": "-273",
+                    "filter": "> 999",
+                    "cmap": "jet",
+                    "range_min": "-20",
+                    "range_max": "50"
+                },
+                "clouds": {
+                    "cover_name": "TOTAL_CLOUD_COVER__GROUND_OR_WATER_SURFACE",
+                    "grid": "0025",
+                    "cummul_duration": "",
+                    "start_time": "1",
+                    "operation": "",
+                    "filter": "< 0.5",
+                    "cmap": "Greys",
+                    "range_min": "0",
+                    "range_max": "100"
+                }
+            }
+        }
+    }
+}

@@ -73,7 +73,16 @@ pip3 cache purge
 ## API usage
 
 The various API files are located in the [core/](core/) folder.
-Before using the various Python scripts, you need to change the API key in the [setting.json](core/settings.json) file to your own. An API key for the Arome model can be obtained from the official Météo France API site: https://portail-api.meteofrance.fr/
+Before using the various Python scripts, you need to create a **user_settings.json** file in the [core](core/) folder. Inside this file, you need to add an object **api_keys**, with inside a data pair holding a valid AROME API key **"arome": "YOUR_API_KEY"**:
+```JSON
+{
+    "api_keys": {
+        "arome": "YOUR_API_KEY"
+    }
+}
+```
+
+An API key for the Arome model can be obtained from the official Météo France API site: https://portail-api.meteofrance.fr/
 
 Once done, the two following Python scripts can then be used:
 

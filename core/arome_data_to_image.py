@@ -88,8 +88,8 @@ def create_image(min_lat, max_lat, min_lon, max_lon, data_type, current_time, da
 
 
 if __name__ == "__main__":
-    # Opening JSON file
-    f = open("settings.json")
+    # Opening Model Settings JSON file
+    f = open("model_settings.json")
     json_data = json.load(f)
     # Closing file
     f.close()
