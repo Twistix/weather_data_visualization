@@ -1,0 +1,8 @@
+{
+    "api_keys": {
+        "AROME": "your_arome_api_key",
+        "GFS": null  // No API key needed for GFS, maybe
+    },
+    "default_model": "AROME",
+    "output_dir": "grib_files/"
+}
