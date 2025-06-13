@@ -1,14 +1,13 @@
-from downloaders.arome001_downloader import arome001_downloader
+from datetime import datetime
+from models.arome001 import AROME001Model
 
-# Create AROME001 downloader
-downloader = arome001_downloader("settings/model_settings.json", "settings/user_settings.json")
+# Create AROME001 model
+model = AROME001Model("settings/user_settings.json")
 
 # Use downloader
-print(f"Status: "+downloader.get_status())
+print(f"Available data types : "+str(model.get_data_types()))
 
-print(f"Available data types : "+str(downloader.get_available_datas()))
+latest_run_time = model.get_last_run("rain")
+print(f"Last run time : " + datetime.strftime(latest_run_time, "%Y-%m-%dT%H.%M.%SZ"))
 
-latest_run_time = downloader.get_last_run("rain")
-print(f"Last run time for rain : "+str(latest_run_time))
-
-downloader.download_run("rain", latest_run_time, "grib_files")
+model.download_run("rain", latest_run_time, "grib_files")
